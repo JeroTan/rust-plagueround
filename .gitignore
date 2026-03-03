@@ -1,0 +1,67 @@
+# Rust build artifacts
+/target/
+**/*.rs.bk
+Cargo.lock
+*.pdb
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# OS files
+Thumbs.db
+.Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.env.local
+.env.*.local
+
+# Node (if using any node-based tools)
+node_modules/
+npm-debug.log
+
+# Python (if using any python-based tools)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
+# Misc
+*.log
+dist/
+build/
+.cargo/
+.rustup/
+
+# Docker artifacts
+.dockerignore
+Dockerfile
+docker-compose.override.yml
+
+# Executable files (platform-specific)
+*.exe
+*.exe.manifest
+*.dll
+*.so
+*.dylib
+
+# Generated documentation
+/doc/
+
+# Visual Studio Code workspace
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json

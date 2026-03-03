@@ -69,6 +69,14 @@ This is a Rust playground workspace created for learning and experimenting with 
   - Enabled `formatOnSave` for automatic code formatting
 - Now code will auto-format when saved using rustfmt
 
+**Git Configuration**
+
+- Created comprehensive `.gitignore` for Rust projects
+  - Excludes: /target/, *.pdb, Cargo.lock, *.exe, build artifacts
+  - Excludes: IDE files (.vscode/, .idea/), OS files (Thumbs.db, .DS_Store)
+  - Excludes: Editor temp files, logs, Docker overrides
+  - Excludes: node_modules, Python cache, generated docs
+
 ---
 
 ## Notes & Context
