@@ -67,12 +67,15 @@ This is a Rust playground workspace created for learning and experimenting with 
 - Created `.vscode/settings.json` with auto-formatting configuration
   - Rust Analyzer set as default formatter for Rust files
   - Enabled `formatOnSave` for automatic code formatting
+  - Set `editor.tabSize: 4` for 4-space indentation (Rust standard)
+  - Set `editor.insertSpaces: true` to use spaces instead of tabs
+- Established VS Code setup as recommended template for all workspace projects
 - Now code will auto-format when saved using rustfmt
 
 **Git Configuration**
 
 - Created comprehensive `.gitignore` for Rust projects
-  - Excludes: /target/, *.pdb, Cargo.lock, *.exe, build artifacts
+  - Excludes: /target/, _.pdb, Cargo.lock, _.exe, build artifacts
   - Excludes: IDE files (.vscode/, .idea/), OS files (Thumbs.db, .DS_Store)
   - Excludes: Editor temp files, logs, Docker overrides
   - Excludes: node_modules, Python cache, generated docs
@@ -81,9 +84,36 @@ This is a Rust playground workspace created for learning and experimenting with 
 
 ## Notes & Context
 
+⚠️ **IMPORTANT RECOMMENDATION FOR NEW PROJECTS:**
+When setting up a new Rust project in this workspace, **ALWAYS ask the user if they want to add VS Code configuration**. See "VS Code Setup Template" section below.
+
 - This workspace is for experimentation and learning Rust
 - Feel free to try different Rust concepts, patterns, and projects
 - Any significant code, patterns, or learnings should be documented here
+
+**VS Code Setup Template** ✨
+
+A workspace-wide `.vscode/settings.json` has been created with the following recommended configuration for all Rust projects:
+
+```json
+{
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
+  }
+}
+```
+
+**Why this is important:**
+
+- Ensures consistency across all Rust projects in the workspace
+- Automatically formats code on save using rustfmt
+- Sets 4-space indentation (Rust standard, not 2 or tabs)
+- Reduces manual formatting and speeds up development
+
+**For new projects:** When user creates new project folders, recommend copying `.vscode/settings.json` to each project's `.vscode/` folder for consistent formatting.
 
 **Docker Architecture:**
 
@@ -97,6 +127,20 @@ This is a Rust playground workspace created for learning and experimenting with 
 - Laptop doesn't support standard installers
 - Using Scoop package manager for all tools
 - Alternative: Podman Desktop if Docker Desktop not available
+
+**Learning Progression** 📚
+
+**Current Phase: Learning Fundamentals**
+- Learning through "The Rust Programming Language" book step-by-step
+- Using `rustc` to compile and understand the basics
+- Will progress to Cargo and Docker once fundamentals are solid
+- **DO NOT rush into Cargo/Docker** - Build strong foundation first
+
+**Future Phases (When Ready):**
+1. Cargo basic projects
+2. Managing dependencies
+3. Cargo features
+4. Then: Docker containerization
 
 ---
 
