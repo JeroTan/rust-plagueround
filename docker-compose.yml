@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  # Example project 1
+  project1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PROJECT_NAME: project1
+    image: rust-playground-project1
+    container_name: rust-project1
+    # Uncomment if you want to run on startup
+    # command: app
+    # For development with volume mounting:
+    # volumes:
+    #   - ./project1:/usr/src/app
+    # command: cargo run
+
+  # Example project 2
+  project2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PROJECT_NAME: project2
+    image: rust-playground-project2
+    container_name: rust-project2
+    # Uncomment if you want to run on startup
+    # command: app
+
+  # Alternative: Development container with Rust toolchain
+  dev:
+    image: rust:latest
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: sleep infinity
+    stdin_open: true
+    tty: true
+
+# To add more projects, follow this pattern:
+#   projectN:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#       args:
+#         PROJECT_NAME: projectN
+#     image: rust-playground-projectN
+#     container_name: rust-projectN

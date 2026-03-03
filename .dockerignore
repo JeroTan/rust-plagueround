@@ -1,0 +1,38 @@
+# Git files
+
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+
+README.md
+AGENT_MEMORY.md
+DOCKER_SETUP.md
+\*.md
+
+# IDE and editor files
+
+.vscode/
+.idea/
+_.swp
+_.swo
+\*~
+.DS_Store
+
+# Rust build artifacts
+
+**/target/
+**/Cargo.lock
+**/\*.rs.bk
+**/\*.pdb
+
+# Docker files
+
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# OS files
+
+Thumbs.db
