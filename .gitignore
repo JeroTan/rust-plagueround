@@ -1,5 +1,5 @@
 # Rust build artifacts
-/target/
+target/
 **/*.rs.bk
 Cargo.lock
 *.pdb
@@ -65,3 +65,8 @@ docker-compose.override.yml
 .vscode/settings.json
 .vscode/launch.json
 .vscode/extensions.json
+
+
+# Added by cargo
+
+/target

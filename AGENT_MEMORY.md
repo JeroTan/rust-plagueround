@@ -14,6 +14,8 @@ This is a Rust playground workspace created for learning and experimenting with 
 - Workspace structure supports multiple independent Rust programs
 - Each project folder will be a separate Rust program with its own Cargo.toml
 - Git repository pushed to GitHub
+- Started exploring Cargo package manager
+- Multiple Cargo projects created: 002_hello_cargo, 003_cargo_name
 
 **Key Decisions:**
 
@@ -21,11 +23,13 @@ This is a Rust playground workspace created for learning and experimenting with 
 - Multi-stage Dockerfile for optimized builds with dependency caching
 - Docker Compose for managing multiple projects simultaneously
 - Scoop-based installation approach (no installers) for Windows environment
+- Decided NOT to rush into Cargo/Docker—learning fundamentals first with rustc
 
 **Active Tasks:**
 
-- Need to install Docker via Scoop before building containers
-- Ready to create first Rust project folders
+- Exploring Cargo.toml and project structure
+- Learning Cargo commands (build, run, etc.)
+- Understanding package naming conventions
 
 ---
 
@@ -75,10 +79,22 @@ This is a Rust playground workspace created for learning and experimenting with 
 **Git Configuration**
 
 - Created comprehensive `.gitignore` for Rust projects
-  - Excludes: /target/, _.pdb, Cargo.lock, _.exe, build artifacts
+  - Excludes: /target/, *.pdb, Cargo.lock, *.exe, build artifacts
   - Excludes: IDE files (.vscode/, .idea/), OS files (Thumbs.db, .DS_Store)
   - Excludes: Editor temp files, logs, Docker overrides
   - Excludes: node_modules, Python cache, generated docs
+- Removed `.exe` and `.pdb` files from git tracking (they were generated artifacts)
+- Committed cleanup with proper .gitignore in place
+
+**Cargo Projects Created**
+
+- **001_hello_world**: Simple `rustc` compiled program (no Cargo)
+- **002_hello_cargo**: Cargo project with name `hello_cargo`
+  - Created using: `cargo init --name hello_cargo`
+  - Contains: Cargo.toml, src/main.rs, .gitignore
+- **003_cargo_name**: Cargo project with name `cargo_name`
+  - Created using: `cargo new 003_cargo_name --name cargo_name`
+  - Demonstrates: `cargo new` with custom package name
 
 ---
 
@@ -141,6 +157,22 @@ A workspace-wide `.vscode/settings.json` has been created with the following rec
 2. Managing dependencies
 3. Cargo features
 4. Then: Docker containerization
+
+**Topics Explored Today:**
+- ✅ Pipes & Standard I/O (stdin, stdout, stderr)
+- ✅ Command-line arguments and how to pass data to programs
+- ✅ Assembly language - direct translation to binary
+- ✅ Registers (AX, BX, CX, etc.) - CPU's fast storage
+- ✅ Why `main()` function exists universally in programming languages
+- ✅ Multiple programs communicating (IPC concepts)
+- ✅ How games are built (assembly optimization in performance-critical parts)
+- ✅ ASCII encoding and printing in assembly
+- ✅ Platform-specific considerations (Linux vs Windows syscalls)
+- ✅ Macros (`!` symbol, code generation, benefits vs functions)
+- ✅ Macro vs Function comparison (performance, flexibility, debugging)
+- ✅ Cargo package manager and naming conventions
+- ✅ `cargo new` and `cargo init` with `--name` flag
+- ✅ Project folder naming vs package naming constraints
 
 ---
 
