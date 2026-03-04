@@ -28,7 +28,81 @@ x = 10;  // ✅ OK
 - TypeScript: `let` = mutable (like JavaScript's `let`)
 - Rust forces intentionality: you must declare `mut` if you plan to change
 
-### 2. Enums (Sum Types)
+### 2. Shadowing (Variable Redeclaration)
+
+**What:** Redeclaring a variable with the same name hides (shadows) the previous one
+
+```rust
+let x = 5;              // x = i32, value 5
+let x = x + 1;          // x = i32, value 6 (old x hidden, not deleted)
+let x = "hello";        // x = &str, value "hello" (can change type!)
+```
+
+**Key insight: You can shadow a variable AND change its type!**
+
+```rust
+let input = "42";                   // &str type
+let input = input.parse::<i32>().expect("not a number");  // i32 type
+let input = input > 20;             // bool type
+```
+
+**What happens to the old value?**
+
+- Old variable becomes **inaccessible** (hidden by the name shadow)
+- Old value is **automatically dropped** (memory freed) immediately
+- **NOT wasted memory** — Rust's ownership system cleans it up instantly
+- No garbage collection needed!
+
+```rust
+let x = String::from("hello");  // Allocates memory for "hello"
+let x = 42;                     // Old String is dropped/freed HERE
+                                // Memory reclaimed, x now = i32
+```
+
+**Shadowing vs Mutability:**
+
+| Shadowing                         | Mutability (`mut`)           |
+| --------------------------------- | ---------------------------- |
+| `let x = 5; let x = 10;`          | `let mut x = 5; x = 10;`     |
+| Creates NEW variable binding      | Changes SAME variable        |
+| Can change type                   | Type stays the same          |
+| Old value dropped immediately     | Overwrites in-place          |
+| Multiple allocations (if complex) | Single allocation            |
+
+**With scope:**
+
+```rust
+{
+    let x = 5;          // x = 5
+    {
+        let x = x + 1;  // Inner: x = 6 (shadows outer x)
+        println!("{}", x);  // Prints 6
+    }
+    println!("{}", x);  // Prints 5 (outer x still accessible)
+}
+// Both cleaned up when scope ends
+```
+
+**Real-world example from guessing game:**
+
+```rust
+let mut guess = String::new();
+io::stdin().read_line(&mut guess).expect("Failed to read line");
+
+// Shadow: String → i32, remove whitespace, parse
+let guess: i32 = guess.trim().parse().expect("Failed to parse");
+
+// Now guess is immutable i32, ready for comparison
+```
+
+**When to use shadowing:**
+
+- ✅ Data transformations (String → i32 → bool)
+- ✅ Removing mutability (read input as mutable, then make immutable)
+- ✅ Type conversions (String → parsed number)
+- ❌ Don't use if you need both old and new values (use different names instead)
+
+### 3. Enums (Sum Types)
 
 **What:** A type that can be ONE of several variants
 
@@ -53,7 +127,7 @@ enum CheckResult<T, E> {
 - Rust: Compiler forces you to handle ALL variants
 - TypeScript: Easy to forget checking `error` property
 
-### 3. Generics (Template Types)
+### 4. Generics (Template Types)
 
 **What:** Code that works with ANY type
 
@@ -78,7 +152,7 @@ CheckResult<bool, MyCustomError>   // bool success, custom error
 - ✅ No runtime overhead (monomorphization)
 - ❌ Without generics: need separate CheckResult_i32, CheckResult_String, etc.
 
-### 4. Pattern Matching (`match`)
+### 5. Pattern Matching (`match`)
 
 **What:** Rust's way of destructuring and handling all cases
 
@@ -116,7 +190,7 @@ match result {
 }
 ```
 
-### 5. Result Type
+### 6. Result Type
 
 **Built-in enum for error handling**
 
@@ -141,7 +215,7 @@ fn read_line(&mut self, buf: &mut String) -> Result<usize, io::Error>
 // Either: Ok(usize) = bytes read, or Err(io::Error) = failed
 ```
 
-### 6. The `use` Statement
+### 7. The `use` Statement
 
 **What:** Imports names into scope
 
@@ -165,6 +239,60 @@ Failure("error")
 
 - TypeScript: Extracts data FROM something at runtime
 - Rust: Imports names INTO scope at compile time
+
+### 8. Traits (Core Concept!)
+
+**What:** A contract/interface that defines methods a type can have
+
+**Key Insight: A type GAINS power by implementing a trait**
+
+Example: `ThreadRng` (a struct from rand crate) implements the `Rng` trait
+- The `Rng` trait defines the `gen_range()` method
+- By implementing Rng, ThreadRng gets that power
+- BUT: We must `use rand::Rng;` to unlock and use the method
+
+```rust
+use rand::Rng;  // ← Must import trait to use its methods
+
+let secret = rand::thread_rng().gen_range(1..=100);
+//            ↓ Returns ThreadRng         ↓ Method from Rng trait
+```
+
+**Why import the trait if ThreadRng already implements it?**
+
+The type exists, but Rust requires you to **explicitly import the trait** to use its methods. This is intentional design:
+- Force awareness of where methods come from
+- Avoid accidentally using wrong methods (name collisions)
+- Trait acts like a "license to use" the methods
+
+**Analogy:**
+- ThreadRng = a car (the thing exists)
+- Rng trait = driving license (gives you right to operate it)
+- Method (gen_range) = driving action (you can do it with a license)
+- Import Rng = getting your license (now you can legally drive)
+
+**Real Example from 003_guessing_game:**
+
+```rust
+use rand::Rng;  // Import the Rng trait
+
+fn main() {
+    // ThreadRng implements Rng trait
+    // Rng trait provides gen_range() method
+    let secret_number = rand::thread_rng().gen_range(1..=100);
+}
+```
+
+**Without the trait import:**
+```rust
+// ❌ ERROR: no method named `gen_range` found
+let secret = rand::thread_rng().gen_range(1..=100);
+```
+
+**Why not just auto-import?**
+- Rust wants explicit imports (clarity over magic)
+- Different traits can have methods with same name
+- Forces you to know what you're getting
 
 ---
 
@@ -291,13 +419,16 @@ use MyResult::*;  // Import all variants
 
 ## What to Study Next
 
+- [x] Traits (Rust's interface/contract system) ← JUST LEARNED!
+- [ ] More trait patterns (writing custom traits)
 - [ ] Rust's `Option<T>` type (similar to `Result`, for nullable values)
-- [ ] Traits (Rust's interface/contract system)
 - [ ] Ownership and borrowing (Rust's memory safety model)
 - [ ] More about `String` vs `&str`
 - [ ] Error handling patterns (custom error types)
 - [ ] Modules and crate organization
+- [ ] The Ordering enum (for comparisons in 003_guessing_game)
+- [ ] Game loop patterns with `loop { }` construct
 
 ---
 
-_Last Updated: 2026-03-03_
+_Last Updated: 2026-03-04_

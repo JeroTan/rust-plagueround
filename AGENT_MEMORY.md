@@ -214,9 +214,13 @@ A workspace-wide `.vscode/settings.json` has been created with the following rec
 - ✅ **Custom Generic Enums** - created `CheckResult<T, E>` like `Result`
 - ✅ **Use Statement** - importing variants into scope
 - ✅ Rust vs TypeScript differences (safety, immutability, pattern matching)
+- ✅ **Traits** - A type gains power by implementing a trait (e.g., Rng trait gives ThreadRng the gen_range() method)
+- ✅ **Trait Imports** - Must import trait to use its methods on types even if the type already exists
+- ✅ **Shadowing** - Redeclare variables with same or different type; old values automatically dropped/freed (no memory waste)
+- ✅ **003_guessing_game** - Started implementation; added rand crate, understood ThreadRng and method chaining
 
-**Summary:** Completed comprehensive introduction to Rust fundamentals including variables, generics, custom types, error handling, and pattern matching. User now understands core Rust concepts and is ready to continue with "The Rust Programming Language" book.
+**Summary:** Completed comprehensive introduction to Rust fundamentals including variables, shadowing, generics, custom types, error handling, pattern matching, and traits. User now understands core Rust concepts, trait mechanism, and variable shadowing patterns. Currently working on 003_guessing_game project.
 
 ---
 
-_Last Updated: 2026-03-03_
+_Last Updated: 2026-03-04_
