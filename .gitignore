@@ -1,7 +1,9 @@
 # Rust build artifacts
 target/
 **/*.rs.bk
-Cargo.lock
+# Note: We DON'T ignore Cargo.lock because our projects are binaries/apps
+# Binary projects should track Cargo.lock for reproducible builds
+# (Only libraries should .gitignore Cargo.lock)
 *.pdb
 
 # IDE and editor files

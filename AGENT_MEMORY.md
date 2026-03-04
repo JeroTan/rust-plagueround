@@ -2,6 +2,8 @@
 
 **IMPORTANT FOR AI:** This document serves as a session memory log. You MUST continually update this file throughout the session to record any highlights, important updates, decisions, and progress made. This helps maintain context across interactions and provides a historical record of the work completed.
 
+**⚠️ LINKED DOCUMENT:** Keep [KNOWLEDGE_MEMORY.md](KNOWLEDGE_MEMORY.md) updated with important concepts and patterns learned. This document tracks what we know, AGENT_MEMORY.md tracks what we did.
+
 ---
 
 ## Summary
@@ -27,9 +29,10 @@ This is a Rust playground workspace created for learning and experimenting with 
 
 **Active Tasks:**
 
-- Exploring Cargo.toml and project structure
-- Learning Cargo commands (build, run, etc.)
-- Understanding package naming conventions
+- ✅ COMPLETED: Cargo projects and commands
+- ✅ COMPLETED: Custom enums with generics
+- ✅ COMPLETED: Pattern matching and error handling
+- Next: Continue with "The Rust Programming Language" book chapters
 
 ---
 
@@ -79,22 +82,49 @@ This is a Rust playground workspace created for learning and experimenting with 
 **Git Configuration**
 
 - Created comprehensive `.gitignore` for Rust projects
-  - Excludes: /target/, *.pdb, Cargo.lock, *.exe, build artifacts
+  - Excludes: /target/, _.pdb, Cargo.lock, _.exe, build artifacts
   - Excludes: IDE files (.vscode/, .idea/), OS files (Thumbs.db, .DS_Store)
   - Excludes: Editor temp files, logs, Docker overrides
   - Excludes: node_modules, Python cache, generated docs
 - Removed `.exe` and `.pdb` files from git tracking (they were generated artifacts)
 - Committed cleanup with proper .gitignore in place
 
-**Cargo Projects Created**
+**Cargo and Package Management**
 
-- **001_hello_world**: Simple `rustc` compiled program (no Cargo)
-- **002_hello_cargo**: Cargo project with name `hello_cargo`
-  - Created using: `cargo init --name hello_cargo`
-  - Contains: Cargo.toml, src/main.rs, .gitignore
-- **003_cargo_name**: Cargo project with name `cargo_name`
-  - Created using: `cargo new 003_cargo_name --name cargo_name`
-  - Demonstrates: `cargo new` with custom package name
+- Created multiple Cargo projects using `cargo new` and `cargo init --name`
+- Learned: `cargo build` (debug) vs `cargo build --release` (optimized)
+- Learned: `cargo run` compiles and executes
+- Fixed `.gitignore` to properly ignore `target/` at any directory level
+- **IMPORTANT**: `Cargo.lock` handling differs by project type:
+  - ✅ **Binary/App/Game**: TRACK Cargo.lock (ensures reproducible builds)
+  - ❌ **Library**: DON'T track Cargo.lock (users have their own)
+  - Reason: `Cargo.lock` locks dependency versions; binaries need consistency
+- Updated `.gitignore` to NOT ignore Cargo.lock (our projects are binaries)
+
+**Enums and Custom Types**
+
+- Created custom enum `CheckResult<T, E>` similar to Rust's `Result<T, E>`
+- Learned: Enums are sum types with named variants
+- Learned: Pattern matching with `match` expression
+- Learned: Each variant can hold different data types
+- Example: `CheckResult::Success(T)` vs `CheckResult::Failure(E)`
+
+**Generics (Key Learning!)**
+
+- **What are generics?** Code that works with ANY type
+- `<T, E>` syntax allows flexibility: `CheckResult<i32, String>`, `CheckResult<bool, MyError>`, etc.
+- Rust's `Result<T, E>` uses generics to be reusable across all functions
+- Generics vs specific types: Generic is flexible, specific is limited
+- Created: `CheckResult<T, E>` enum that works like `Result<T, E>`
+
+**Pattern Matching & Error Handling**
+
+- `match` expression (Rust's way, not if-else)
+  - Forces you to handle ALL cases
+  - Safer than TypeScript's optional checks
+- `use CheckResult::{Success, Failure}` - imports variants into scope
+- Underscore `_` - ignores values you don't need
+- `.expect()`, `.is_ok()`, `.is_err()` - shorthand helpers
 
 ---
 
@@ -147,32 +177,45 @@ A workspace-wide `.vscode/settings.json` has been created with the following rec
 **Learning Progression** 📚
 
 **Current Phase: Learning Fundamentals**
+
 - Learning through "The Rust Programming Language" book step-by-step
 - Using `rustc` to compile and understand the basics
 - Will progress to Cargo and Docker once fundamentals are solid
 - **DO NOT rush into Cargo/Docker** - Build strong foundation first
 
 **Future Phases (When Ready):**
+
 1. Cargo basic projects
 2. Managing dependencies
 3. Cargo features
 4. Then: Docker containerization
 
 **Topics Explored Today:**
+
 - ✅ Pipes & Standard I/O (stdin, stdout, stderr)
 - ✅ Command-line arguments and how to pass data to programs
 - ✅ Assembly language - direct translation to binary
 - ✅ Registers (AX, BX, CX, etc.) - CPU's fast storage
 - ✅ Why `main()` function exists universally in programming languages
 - ✅ Multiple programs communicating (IPC concepts)
-- ✅ How games are built (assembly optimization in performance-critical parts)
+- ✅ How games are built (assembly optimization)
 - ✅ ASCII encoding and printing in assembly
 - ✅ Platform-specific considerations (Linux vs Windows syscalls)
 - ✅ Macros (`!` symbol, code generation, benefits vs functions)
-- ✅ Macro vs Function comparison (performance, flexibility, debugging)
+- ✅ Macro vs Function comparison (performance, flexibility)
 - ✅ Cargo package manager and naming conventions
 - ✅ `cargo new` and `cargo init` with `--name` flag
 - ✅ Project folder naming vs package naming constraints
+- ✅ **Variables & Mutability** - immutable by default with `mut` keyword
+- ✅ **Enums** - sum types with variants, custom error types
+- ✅ **Generics** - `<T, E>` templates that work with ANY types
+- ✅ **Pattern Matching** - `match` expressions force handling all cases
+- ✅ **Result Type** - built-in `Result<T, E>` for error handling
+- ✅ **Custom Generic Enums** - created `CheckResult<T, E>` like `Result`
+- ✅ **Use Statement** - importing variants into scope
+- ✅ Rust vs TypeScript differences (safety, immutability, pattern matching)
+
+**Summary:** Completed comprehensive introduction to Rust fundamentals including variables, generics, custom types, error handling, and pattern matching. User now understands core Rust concepts and is ready to continue with "The Rust Programming Language" book.
 
 ---
 
