@@ -234,13 +234,13 @@ false || true && false         // = false (AND evaluated first)
 
 **TypeScript vs Rust:**
 
-| Feature | TypeScript | Rust |
-|---------|-----------|------|
-| **Parentheses required for `if`** | ✅ `if (x > 5) {}` | ❌ `if x > 5 {}` |
-| **Logical AND** | `&&` | `&&` |
-| **Logical OR** | `\|\|` | `\|\|` |
-| **Logical NOT** | `!` | `!` |
-| **Base rule** | Always use parentheses | Use parentheses only for precedence |
+| Feature                           | TypeScript             | Rust                                |
+| --------------------------------- | ---------------------- | ----------------------------------- |
+| **Parentheses required for `if`** | ✅ `if (x > 5) {}`     | ❌ `if x > 5 {}`                    |
+| **Logical AND**                   | `&&`                   | `&&`                                |
+| **Logical OR**                    | `\|\|`                 | `\|\|`                              |
+| **Logical NOT**                   | `!`                    | `!`                                 |
+| **Base rule**                     | Always use parentheses | Use parentheses only for precedence |
 
 **Summary:**
 
@@ -285,6 +285,7 @@ println!("C");
 **A buffer is temporary storage in RAM that collects data before sending it to an external system.**
 
 **Analogy — The Mail Carrier:**
+
 - You're a mail carrier picking up letters from a collection box
 - Instead of driving to the post office **after each single letter**, you collect 50 letters in your mailbag (the buffer)
 - Then you make **one trip** to the post office with all 50 letters at once
@@ -307,11 +308,13 @@ When you do `print!("Hello")`, the text doesn't go **directly** to your screen. 
 Sending data to external systems (screen, disk, network) is **slow**. Buffers batch data for efficiency:
 
 **With buffering (efficient):**
+
 ```
 Collect 100 characters in RAM (fast) → Send once to screen (1 slow operation)
 ```
 
 **Without buffering (wasteful):**
+
 ```
 Send 1 character to screen (slow) → wait
 Send 1 character to screen (slow) → wait
@@ -352,11 +355,13 @@ io::stdin().read_line(&mut guess);     // Program immediately waits for input
 ```
 
 **What you expect:**
+
 ```
 Please input your guess: [cursor here]
 ```
 
 **What you see:**
+
 ```
 [cursor blinking, no prompt shown]
 ```
@@ -364,6 +369,7 @@ Please input your guess: [cursor here]
 The prompt text is sitting in the buffer, waiting for `\n`. But `read_line()` already started waiting for your input!
 
 **Analogy — The Cashier:**
+
 - `println!("Your total:")` = Cashier **announces it out loud immediately** → You hear it ✓
 - `print!("Your total:")` = Cashier **writes it on paper, holds it without showing you**, then immediately **waits for payment** → You see the cashier waiting for money BEFORE you see what you owe!
 
@@ -388,6 +394,7 @@ io::stdin().read_line(&mut guess);  // Now prompt is visible before input
 Buffers are used **everywhere** data crosses boundaries between systems:
 
 **Files:**
+
 ```rust
 let mut file = File::create("data.txt")?;
 file.write_all(b"Hello")?;   // Buffered — might not be on disk yet!
@@ -397,28 +404,36 @@ file.flush()?;               // NOW write to actual disk
 ```
 
 **Network (Downloading):**
+
 ```
 Internet  →  [BUFFER in RAM]  →  Your Hard Drive
 ```
+
 Your computer buffers data from the network before writing to disk. Downloads happen in chunks, not byte-by-byte.
 
 **Video (YouTube Buffering!):**
+
 ```
 YouTube Server  →  [BUFFER in your RAM]  →  Video Player  →  Screen
 (Internet)         (temporary storage)      (renders frames)
 ```
+
 When YouTube "buffers" (loading circle ⏳), it means the buffer doesn't have enough data to play smoothly. It's downloading ahead so playback is smooth even if your internet is slightly slow.
 
 **Audio (Spotify/Music):**
+
 ```
 Spotify  →  [BUFFER of song data]  →  Audio Card  →  Speakers
 ```
+
 Audio streams are buffered so playback is smooth even during brief network hiccups.
 
 **Graphics/Games:**
+
 ```
 Game Code  →  [BUFFER of frames]  →  GPU  →  Screen
 ```
+
 Games buffer frames before rendering to avoid visual tearing.
 
 ---
@@ -473,15 +488,15 @@ At the lowest level, `flush()` triggers a **system call** — a special CPU inst
 
 #### Summary Table
 
-| Concept | What It Does | When Used |
-|---------|-------------|-----------|
-| `print!()` | Output text, NO newline, NO auto-flush | When you want text on same line |
-| `println!()` | Output text + newline (`\n`), auto-flushes | Most common output |
-| **Buffer** | Temporary RAM storage for batching data | Any I/O operation (screen/disk/network) |
-| **Line buffer** | Auto-sends when `\n` detected | Terminal/screen (default mode) |
-| **Full buffer** | Auto-sends when buffer is full | Files, network streams |
-| `flush()` | Manual override: "SEND NOW!" | When you need immediate output without `\n` |
-| `Write` trait | Provides `flush()` method | Must `use std::io::Write;` to use |
+| Concept         | What It Does                               | When Used                                   |
+| --------------- | ------------------------------------------ | ------------------------------------------- |
+| `print!()`      | Output text, NO newline, NO auto-flush     | When you want text on same line             |
+| `println!()`    | Output text + newline (`\n`), auto-flushes | Most common output                          |
+| **Buffer**      | Temporary RAM storage for batching data    | Any I/O operation (screen/disk/network)     |
+| **Line buffer** | Auto-sends when `\n` detected              | Terminal/screen (default mode)              |
+| **Full buffer** | Auto-sends when buffer is full             | Files, network streams                      |
+| `flush()`       | Manual override: "SEND NOW!"               | When you need immediate output without `\n` |
+| `Write` trait   | Provides `flush()` method                  | Must `use std::io::Write;` to use           |
 
 **Real Fix Applied in Guessing Game:**
 
