@@ -217,10 +217,43 @@ A workspace-wide `.vscode/settings.json` has been created with the following rec
 - ✅ **Traits** - A type gains power by implementing a trait (e.g., Rng trait gives ThreadRng the gen_range() method)
 - ✅ **Trait Imports** - Must import trait to use its methods on types even if the type already exists
 - ✅ **Shadowing** - Redeclare variables with same or different type; old values automatically dropped/freed (no memory waste)
+  - **✨ CONFIRMED by official Rust book!** Book explicitly teaches shadowing pattern for type conversion (String → i32)
+  - Use case: Reuse variable names instead of creating guess_str and guess separately
+  - **Community consensus:** Default to shadowing for transformations; use `mut` only for repeated modifications
+  - **Hybrid pattern:** Use `mut` during setup, shadow to lock as immutable (best practice in production)
+- ✅ **Expressions vs Statements (Semicolon Rule)** - Key to understanding when functions return values
+  - No semicolon = Expression (returns value) ✅
+  - Semicolon = Statement (returns nothing/unit type) ❌
+  - Idiomatic Rust: use expressions, no `return` keyword needed
+  - Builder pattern relies on this: `self` with no semicolon to enable chaining
+- ✅ **`match` is Rust's only conditional branching for multiple cases (NO `switch` statement!)**
+  - `match` vs `switch`: match is exhaustive, no fallthrough, returns values, powerful patterns
+  - Compiler forces handling ALL cases (catches bugs TypeScript switch allows)
+  - Can match on ranges, tuples, enums, with guard clauses
+  - Returns value (expression), not statement (different from switch)
+  - Rust philosophy: one clear powerful way instead of multiple tools
 - ✅ **003_guessing_game** - Started implementation; added rand crate, understood ThreadRng and method chaining
+- ✅ **Conditions and Logical Operators** - Parentheses optional, only needed for precedence
+  - Base rule: NO parentheses for `if` conditions (Rust design difference from TypeScript)
+  - Use `&&`, `||`, `!` for multiple conditions
+  - Parentheses only for operator precedence when mixing && and ||
 
-**Summary:** Completed comprehensive introduction to Rust fundamentals including variables, shadowing, generics, custom types, error handling, pattern matching, and traits. User now understands core Rust concepts, trait mechanism, and variable shadowing patterns. Currently working on 003_guessing_game project.
+**Summary:** Completed comprehensive introduction to Rust fundamentals including variables, shadowing, generics, custom types, error handling, pattern matching, traits, method chaining, and conditions. User has strong understanding of Rust's syntax philosophy and differences from TypeScript. Currently building 003_guessing_game with loop control.
 
 ---
 
-_Last Updated: 2026-03-04_
+### 2026-03-06 Session Update
+
+**Major Breakthroughs:**
+
+1. **Builder Pattern & Method Chaining** - User understood that returning `Self` with no semicolon enables fluent interfaces
+2. **Expressions vs Statements** - Semicolon rule: key to understanding when functions return values
+3. **Match is Rust's only tool** - Rust removed `switch`, replaced with superior exhaustive `match`
+4. **Parentheses are optional** - Rust doesn't require parentheses for conditions (unlike TypeScript)
+5. **Hybrid Shadowing Pattern** - Discovered production pattern: `mut` for setup, shadow to lock immutable
+
+**User Learning Style:** Asks "why" questions, compares to TypeScript background, understands design philosophy deeply
+
+---
+
+_Last Updated: 2026-03-06_
