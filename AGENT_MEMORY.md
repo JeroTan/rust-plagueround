@@ -256,4 +256,63 @@ A workspace-wide `.vscode/settings.json` has been created with the following rec
 
 ---
 
-_Last Updated: 2026-03-06_
+### 2026-03-09 Session Update
+
+**RC Car Project Development & Finalization**
+
+1. **Tools & Accessories Section Added to FINAL_PROJECT.md**
+   - Created comprehensive tools list: soldering iron, multimeter, wire stripper, helping hands
+   - Assembly accessories: breadboard, Dupont jumpers, silicone wire, heat shrink tubing, zip ties
+   - Optional nice-to-haves: crimping tool, desoldering pump, flux pen, wire labels
+   - Added "What Connects to What" method guide showing solder vs breadboard vs connectors
+   - Updated budget summary to include tools ($40-65) and accessories ($30-50)
+   - **Grand Total for first-time builder: $130-210** (or $105-170 if you already own soldering iron + multimeter)
+
+2. **Generic RC Car Terminology - Replaced all AE86 Placeholders**
+   - **Rationale:** Project is for ANY RC car body, not specifically AE86. LEGO Technic chassis is flexible.
+   - **30 replacements made:**
+     - Section headers: "Path B: Advanced — AE86 Drift Machine" → "Path B: Advanced — WiFi RC Car"
+     - Code: `struct AE86` → `struct RCCar`, `AE86Controller` → `CarController`
+     - WiFi SSID: `AE86_TOFU` → `RC_CAR_WIFI`
+     - Concept: "1:20 scale AE86 frame" → "1:20 scale RC car frame" or "any car body"
+     - Removed: "Initial D inspired!" (was anime-specific flavor text)
+   - **Chassis note:** User can shape LEGO Technic into any car design they want (AE86, Supra, GT-R, realistic model car, etc.)
+   - All 44 AE86/TOFU/Initial D references eliminated from FINAL_PROJECT.md
+   - Project now clearly positions "WiFi RC Car" as generic platform for any car body
+
+3. **Hardware Q&A Session (15 questions on March 9)**
+   - User systematically asked practical questions before committing to hardware purchases
+   - Questions covered: electricity knowledge, HAL abstraction layers, servo APIs, UDP protocols, gear physics, motor upgrades, LEGO sourcing, mounting strategies
+   - Key validation: User confirmed they will skip Easy Path (Arduino) and go direct to ESP32-S3 Advanced path
+   - **Strategic decision locked in:** Direct AE86→WiFi RC Car path is the chosen trajectory
+
+4. **Current Project State**
+   - **FINAL_PROJECT.md**: v2.0 now generic (removed AE86 placeholders)
+   - **KNOWLEDGE_MEMORY.md**: Section 5 (Async Rust) added and committed (March 9)
+   - **003_guessing_game**: Two bugs identified (buffer flush + loop scoping) but NOT YET FIXED
+   - **Git commits**: Clean, all major docs pushed to origin/main
+
+5. **Pending Tasks**
+   - Fix 003_guessing_game bugs (buffer + loop issues)
+   - Ownership & borrowing deep dive (next major Rust concept)
+   - Hardware ordering (user ready, just gathering information)
+   - Rust ESP32-S3 toolchain setup (future)
+
+**Documentation Status:**
+
+- ✅ FINAL_PROJECT.md: Tools section added, AE86 references replaced with "RC Car"
+- ✅ KNOWLEDGE_MEMORY.md: Section 5 (Async Rust) committed
+- ✅ Budget updated to include tools and accessories
+- ⏳ 003_guessing_game: Bugs identified, awaiting fixes
+- ⏳ Ownership & borrowing: Next learning phase
+
+**User Intent Evolution:**
+
+- Phase 1 (Mar 3-4): Learning Rust fundamentals
+- Phase 2 (Mar 4-6): Planning RC car project
+- Phase 3 (Mar 6-9): Deep-diving hardware architecture (15 Q&A questions)
+- Phase 4 (Mar 9): Finalizing documentation, generic RC car positioning, tools list
+
+---
+
+_Last Updated: 2026-03-09_

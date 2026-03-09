@@ -1242,14 +1242,14 @@ use MyResult::*;  // Import all variants
 
 ### The Core Model Differences
 
-| Aspect | **Go** | **TypeScript** | **Rust** |
-|--------|--------|---|---|
-| **Concurrency Model** | Green threads (OS threads under the hood) | Single-threaded event loop | Zero-cost abstraction (compile-time) |
-| **Scheduler** | Go runtime (automatic, can spawn 10,000s easily) | JavaScript event loop (fixed 1 thread) | You choose: Tokio, Embassy, async-std, etc. |
-| **Memory Per Task** | ~2KB per goroutine | Lightweight heap closure (~200 bytes) | **Tiny (~100 bytes)** — compile-time sized |
-| **Parallelism** | True multi-core (OS threads) | Fake (async hides latency, same CPU) | **Both!** Can use tokio for multi-core OR single-threaded |
-| **Backpressure** | Automatic (runtime manages) | Automatic (event loop manages) | **Manual** (you control it) |
-| **Performance** | Good, but runtime overhead | Fast for I/O, single-core only | **Optimal** — zero-cost, fully optimized |
+| Aspect                | **Go**                                           | **TypeScript**                         | **Rust**                                                  |
+| --------------------- | ------------------------------------------------ | -------------------------------------- | --------------------------------------------------------- |
+| **Concurrency Model** | Green threads (OS threads under the hood)        | Single-threaded event loop             | Zero-cost abstraction (compile-time)                      |
+| **Scheduler**         | Go runtime (automatic, can spawn 10,000s easily) | JavaScript event loop (fixed 1 thread) | You choose: Tokio, Embassy, async-std, etc.               |
+| **Memory Per Task**   | ~2KB per goroutine                               | Lightweight heap closure (~200 bytes)  | **Tiny (~100 bytes)** — compile-time sized                |
+| **Parallelism**       | True multi-core (OS threads)                     | Fake (async hides latency, same CPU)   | **Both!** Can use tokio for multi-core OR single-threaded |
+| **Backpressure**      | Automatic (runtime manages)                      | Automatic (event loop manages)         | **Manual** (you control it)                               |
+| **Performance**       | Good, but runtime overhead                       | Fast for I/O, single-core only         | **Optimal** — zero-cost, fully optimized                  |
 
 ---
 
@@ -1267,7 +1267,7 @@ func main() {
             stream(frame)
         }
     }()
-    
+
     // Spawn goroutine 2: Motor control
     go func() {
         for {
@@ -1275,7 +1275,7 @@ func main() {
             updateMotor(controls)
         }
     }()
-    
+
     // Both run "simultaneously" with scheduler magic
     // Runtime creates OS threads, juggles context switches
     // Easy! But can't optimize for embedded systems
@@ -1292,26 +1292,26 @@ func main() {
 ```typescript
 // TypeScript: Clean syntax, but single-threaded
 async function main() {
-    // Both tasks run on SAME CPU core
-    await Promise.all([
-        videoStreamTask(),      // Waits for .await
-        motorControlTask()      // Waits for .await
-    ]);
+  // Both tasks run on SAME CPU core
+  await Promise.all([
+    videoStreamTask(), // Waits for .await
+    motorControlTask(), // Waits for .await
+  ]);
 }
 
 async function videoStreamTask() {
-    while (true) {
-        const frame = await captureVideo();  // Blocks
-        await streamMJPEG(frame);             // Blocks
-        // If this takes >1ms, motor control gets delayed! 😬
-    }
+  while (true) {
+    const frame = await captureVideo(); // Blocks
+    await streamMJPEG(frame); // Blocks
+    // If this takes >1ms, motor control gets delayed! 😬
+  }
 }
 
 async function motorControlTask() {
-    while (true) {
-        const controls = await readUDP();    // Waits for video task!
-        updateMotor(controls);
-    }
+  while (true) {
+    const controls = await readUDP(); // Waits for video task!
+    updateMotor(controls);
+  }
 }
 ```
 
@@ -1330,10 +1330,10 @@ use embassy_executor::Spawner;
 async fn main(spawner: Spawner) {
     // Task 1: Camera on CPU core 1
     spawner.spawn(camera_task()).unwrap();
-    
+
     // Task 2: Motor on CPU core 2
     spawner.spawn(motor_task()).unwrap();
-    
+
     // Both run in PARALLEL on dual-core ESP32!
     // No task can starve the other
     // Compiler guarantees NO data races
@@ -1403,7 +1403,7 @@ Go and TypeScript **won't** catch this error — it appears at runtime as a race
 async fn motor_task() {
     loop {
         let packet = read_udp().await;
-        
+
         // This blocks the entire task while mutex is held!
         let mut m = motor.lock().unwrap();
         m.set_speed(50);
@@ -1458,13 +1458,13 @@ TypeScript just uses JavaScript event loop (no choice).
 
 **For your AE86:**
 
-| Scenario | Why Rust Wins |
-|----------|---|
+| Scenario                         | Why Rust Wins                                                       |
+| -------------------------------- | ------------------------------------------------------------------- |
 | **WiFi + Camera simultaneously** | True parallelism on dual-core (Go/TS can do this but with overhead) |
-| **Safety** | Compiler prevents data races (Go/TS can't) |
-| **Performance** | Zero runtime overhead vs Go's 2KB/goroutine |
-| **Embedded** | Works on ESP32 with tiny footprint (Go/TS need huge runtime) |
-| **Real-time** | Predictable timing, no garbage collector pauses (Go has GC!) |
+| **Safety**                       | Compiler prevents data races (Go/TS can't)                          |
+| **Performance**                  | Zero runtime overhead vs Go's 2KB/goroutine                         |
+| **Embedded**                     | Works on ESP32 with tiny footprint (Go/TS need huge runtime)        |
+| **Real-time**                    | Predictable timing, no garbage collector pauses (Go has GC!)        |
 
 ---
 
