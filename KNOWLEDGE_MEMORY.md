@@ -1234,18 +1234,267 @@ use MyResult::*;  // Import all variants
 
 ---
 
+## Async Rust: Concurrency Without Threads (March 9 Deep Dive)
+
+**Context:** Understanding how Rust's async/await differs from Go goroutines and TypeScript async/await is crucial for the AE86 project (WiFi + Camera simultaneous tasks).
+
+---
+
+### The Core Model Differences
+
+| Aspect | **Go** | **TypeScript** | **Rust** |
+|--------|--------|---|---|
+| **Concurrency Model** | Green threads (OS threads under the hood) | Single-threaded event loop | Zero-cost abstraction (compile-time) |
+| **Scheduler** | Go runtime (automatic, can spawn 10,000s easily) | JavaScript event loop (fixed 1 thread) | You choose: Tokio, Embassy, async-std, etc. |
+| **Memory Per Task** | ~2KB per goroutine | Lightweight heap closure (~200 bytes) | **Tiny (~100 bytes)** — compile-time sized |
+| **Parallelism** | True multi-core (OS threads) | Fake (async hides latency, same CPU) | **Both!** Can use tokio for multi-core OR single-threaded |
+| **Backpressure** | Automatic (runtime manages) | Automatic (event loop manages) | **Manual** (you control it) |
+| **Performance** | Good, but runtime overhead | Fast for I/O, single-core only | **Optimal** — zero-cost, fully optimized |
+
+---
+
+### Go Goroutines: Simple Magic
+
+```go
+// Go: Dead simple, runtime handles EVERYTHING
+package main
+
+func main() {
+    // Spawn goroutine 1: Video streaming
+    go func() {
+        for {
+            frame := captureVideo()
+            stream(frame)
+        }
+    }()
+    
+    // Spawn goroutine 2: Motor control
+    go func() {
+        for {
+            controls := readUDP()
+            updateMotor(controls)
+        }
+    }()
+    
+    // Both run "simultaneously" with scheduler magic
+    // Runtime creates OS threads, juggles context switches
+    // Easy! But can't optimize for embedded systems
+}
+```
+
+**Pros:** Super simple, works everywhere  
+**Cons:** Goroutine overhead (~2KB each), Go runtime required, can't embed on microcontrollers
+
+---
+
+### TypeScript Async/Await: Event Loop Illusion
+
+```typescript
+// TypeScript: Clean syntax, but single-threaded
+async function main() {
+    // Both tasks run on SAME CPU core
+    await Promise.all([
+        videoStreamTask(),      // Waits for .await
+        motorControlTask()      // Waits for .await
+    ]);
+}
+
+async function videoStreamTask() {
+    while (true) {
+        const frame = await captureVideo();  // Blocks
+        await streamMJPEG(frame);             // Blocks
+        // If this takes >1ms, motor control gets delayed! 😬
+    }
+}
+
+async function motorControlTask() {
+    while (true) {
+        const controls = await readUDP();    // Waits for video task!
+        updateMotor(controls);
+    }
+}
+```
+
+**Pros:** Very clean syntax, works on all OSs  
+**Cons:** Single-threaded only, can't utilize multi-core (ESP32 has 2 cores!), event loop latency issues, one slow task blocks everything
+
+---
+
+### Rust Async/Await: True Power
+
+```rust
+// Rust: More explicit, but TRULY concurrent + safe
+use embassy_executor::Spawner;
+
+#[embassy_executor::main]
+async fn main(spawner: Spawner) {
+    // Task 1: Camera on CPU core 1
+    spawner.spawn(camera_task()).unwrap();
+    
+    // Task 2: Motor on CPU core 2
+    spawner.spawn(motor_task()).unwrap();
+    
+    // Both run in PARALLEL on dual-core ESP32!
+    // No task can starve the other
+    // Compiler guarantees NO data races
+}
+
+#[embassy_task]
+async fn camera_task() {
+    loop {
+        let frame = capture_camera().await;  // Non-blocking
+        stream_mjpeg(frame).await;            // Non-blocking
+        // Does NOT block motor_task() even if this takes 10ms!
+    }
+}
+
+#[embassy_task]
+async fn motor_task() {
+    loop {
+        let packet = read_udp().await;        // Non-blocking
+        update_motor(packet).await;           // Non-blocking
+        // Runs in parallel on core 2, completely independent
+    }
+}
+```
+
+**Pros:** True concurrency, uses multi-core, zero runtime overhead, memory-safe by design, fast  
+**Cons:** Must think about ownership (compiler enforces it), `.await` placement matters
+
+---
+
+### Why Rust Async "Seems Harder"
+
+#### 1. **Ownership Across `.await` Points**
+
+```rust
+// ❌ COMPILER ERROR: Who owns the motor?
+async fn task1() {
+    motor.set_speed(100);
+}
+
+async fn task2() {
+    motor.set_speed(50);  // ERROR! Can't both own motor
+    //                    // Task 1 already owns it
+}
+
+// ✅ CORRECT: Shared ownership with Arc<Mutex<>>
+use std::sync::{Arc, Mutex};
+
+let motor = Arc::new(Mutex::new(Motor::new()));
+spawner.spawn(task1(motor.clone()));
+spawner.spawn(task2(motor.clone()));
+
+async fn task1(motor: Arc<Mutex<Motor>>) {
+    motor.lock().unwrap().set_speed(100);
+}
+
+async fn task2(motor: Arc<Mutex<Motor>>) {
+    motor.lock().unwrap().set_speed(50);
+}
+```
+
+Go and TypeScript **won't** catch this error — it appears at runtime as a race condition bug! 🚨
+
+#### 2. **`.await` Placement is Critical**
+
+```rust
+// ❌ WRONG: Sync code inside async function (blocks!)
+async fn motor_task() {
+    loop {
+        let packet = read_udp().await;
+        
+        // This blocks the entire task while mutex is held!
+        let mut m = motor.lock().unwrap();
+        m.set_speed(50);
+        std::thread::sleep(Duration::from_millis(100));  // BLOCKS!
+        // ↑ Entire task frozen, video task can't run!
+    }
+}
+
+// ✅ RIGHT: Minimize lock holding time
+async fn motor_task() {
+    loop {
+        let packet = read_udp().await;
+        {
+            // Lock held only briefly
+            motor.lock().unwrap().set_speed(50);
+        }  // Lock released here
+        // Video task can run now
+        other_async_work().await;
+    }
+}
+```
+
+#### 3. **You Choose the Runtime**
+
+```rust
+// For ESP32 (embedded):
+// use embassy_executor (minimal, ~5KB overhead)
+#[embassy_executor::main]
+
+// For desktop (powerful):
+// use tokio (full-featured, ~1MB overhead, better for complex apps)
+#[tokio::main]
+async fn main() { ... }
+
+// For server (simple):
+// use async-std
+#[async_std::main]
+async fn main() { ... }
+```
+
+Go just uses Go runtime (no choice).  
+TypeScript just uses JavaScript event loop (no choice).  
+**Rust lets you optimize for your platform.**
+
+---
+
+### The Honest Truth
+
+**Go says:** "Here's concurrency, just works!"  
+**TypeScript says:** "Here's concurrency, works on one core!"  
+**Rust says:** "Here's concurrency, you must understand it, but it's safe and fast!"
+
+**For your AE86:**
+
+| Scenario | Why Rust Wins |
+|----------|---|
+| **WiFi + Camera simultaneously** | True parallelism on dual-core (Go/TS can do this but with overhead) |
+| **Safety** | Compiler prevents data races (Go/TS can't) |
+| **Performance** | Zero runtime overhead vs Go's 2KB/goroutine |
+| **Embedded** | Works on ESP32 with tiny footprint (Go/TS need huge runtime) |
+| **Real-time** | Predictable timing, no garbage collector pauses (Go has GC!) |
+
+---
+
+### Key Takeaway
+
+> **Async Rust isn't harder, it's more honest. You must guarantee thread safety yourself, but the compiler verifies it. Go/TypeScript hide the complexity — Rust makes you confront it upfront, which is actually safer.**
+
+**For the AE86 project specifically:**
+
+- Rust async on Embassy (ESP32 framework) = perfect fit
+- Can spawn 2 tasks (video + motor control) for true parallelism
+- No data races possible (compiler checks)
+- Minimal overhead (fits in ESP32's 4MB Flash)
+
+---
+
 ## What to Study Next
 
-- [x] Traits (Rust's interface/contract system) ← JUST LEARNED!
-- [ ] More trait patterns (writing custom traits)
+- [x] Traits (Rust's interface/contract system) ← LEARNED!
+- [x] Async vs Go/TypeScript paradigm comparison ← JUST LEARNED!
+- [ ] **Ownership and borrowing** (fundamental for async!)
 - [ ] Rust's `Option<T>` type (similar to `Result`, for nullable values)
-- [ ] Ownership and borrowing (Rust's memory safety model)
 - [ ] More about `String` vs `&str`
 - [ ] Error handling patterns (custom error types)
 - [ ] Modules and crate organization
 - [ ] The Ordering enum (for comparisons in 003_guessing_game)
 - [ ] Game loop patterns with `loop { }` construct
+- [ ] Embassy async executor (for AE86 Phase 2)
+- [ ] Tokio runtime (for desktop/server async)
 
 ---
 
-_Last Updated: 2026-03-04_
+_Last Updated: 2026-03-09_
